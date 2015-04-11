@@ -9,11 +9,17 @@ String.prototype.contains = function(text) {
   return this.indexOf(text) !== -1; 
 };
 
+function removeClassFromElements(classname) {
+    var x = document.getElementsByClassName(classname);
+    var i;
+    for (i = 0; i < x.length; i++) {
+        x[i].classList.remove(classname);
+    }
+}
 
 chrome.extension.onMessage.addListener(
 
-  function(request, sender) {
-
+  function doStuff(request, sender) {
   // Gather links  
   var pageLinks = document.getElementsByTagName('a');
   var totalvalid = pageLinks.length;
@@ -22,7 +28,13 @@ chrome.extension.onMessage.addListener(
   var invalid = 0;
   var passed = 0;
   var rpBox;
-
+  // Clear the Previous Run
+  if(document.getElementById("CMY_ReportBox")){
+      document.getElementById("CMY_ReportBox").remove();
+  }
+  removeClassFromElements("CMY_Link");
+  removeClassFromElements("CMY_Valid");
+  removeClassFromElements("CMY_Invalid");
 
   (
   function(pg){
@@ -134,7 +146,8 @@ chrome.extension.onMessage.addListener(
     }
     
     rpBoxAmt.innerHTML = "Links: " + totalvalid;
-    
+    // Remove the event listener in the event this is run again without reloading
+    chrome.extension.onMessage.removeListener(doStuff); 
   }(pageLinks)
   )
 
@@ -164,7 +177,6 @@ chrome.extension.onMessage.addListener(
       }
     });      
   }
-    
     return true;
 
   });
