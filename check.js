@@ -9,11 +9,24 @@ String.prototype.contains = function(text) {
   return this.indexOf(text) !== -1; 
 };
 
+function removeClassFromElements(classname) {
+    var x = document.getElementsByClassName(classname);
+    var i;
+    for (i = 0; i < x.length; i++) {
+        x[i].classList.remove(classname);
+    }
+}
+
+function removeDOMElement(id){
+  if(document.getElementById(id)){
+      document.getElementById(id).remove();
+  }
+}
+
 
 chrome.extension.onMessage.addListener(
 
-  function(request, sender) {
-
+  function doStuff(request, sender) {
   // Gather links  
   var pageLinks = document.getElementsByTagName('a');
   var totalvalid = pageLinks.length;
@@ -22,7 +35,11 @@ chrome.extension.onMessage.addListener(
   var invalid = 0;
   var passed = 0;
   var rpBox;
-
+  // Clear the Previous Run
+  removeDOMElement("CMY_ReportBox");
+  removeClassFromElements("CMY_Link");
+  removeClassFromElements("CMY_Valid");
+  removeClassFromElements("CMY_Invalid");
 
   (
   function(pg){
@@ -52,6 +69,7 @@ chrome.extension.onMessage.addListener(
     reportStyle.appendChild(document.createTextNode("#CMY_ReportBox #CMY_RB_Perc{font-size: 50px; line-height: 50px; color:#fff; background: #111; padding: 10px; text-shadow: 0px 0px 5px rgba(255,255,255,0.8); text-align: center;}"));
     reportStyle.appendChild(document.createTextNode("#CMY_ReportBox #CMY_RB_Pass{border-top: 1px solid #bddf5d; border-right: 1px solid #8db615; float:left; border-radius: 0px 0px 0px 5px; background-color:#9fcd19; background-position-x: 8px; background-position-y: 5px;}"));
     reportStyle.appendChild(document.createTextNode("#CMY_ReportBox #CMY_RB_Fail{border-top: 1px solid #c54f4f; float: right; border-radius: 0px 0px 5px 0px; background-color: #a9060a; background-position-x: 8px; background-position-y: -52px;}"));
+    reportStyle.appendChild(document.createTextNode("#CMY_ReportBox #CMY_RB_Close{float: right;color:#ffffff}"));
         
     var reportBox = document.createElement("div");
     var rbHeader = document.createElement("div");
@@ -60,7 +78,10 @@ chrome.extension.onMessage.addListener(
     var rbQueue = document.createElement("div");
     var rbPass = document.createElement("div");
     var rbFail = document.createElement("div");
-    
+    var rbClose = document.createElement("div");
+    rbClose.innerHTML = "X";
+    rbClose.setAttribute("id", "CMY_RB_Close");
+
     reportBox.setAttribute("id", "CMY_ReportBox");
     rbHeader.setAttribute("id", "CMY_RB_Header");
     rbHeader.innerHTML = "Link Results";
@@ -79,13 +100,15 @@ chrome.extension.onMessage.addListener(
     
     document.getElementsByTagName("body")[0].appendChild(reportBox);
     rpBox = document.getElementById("CMY_ReportBox");
-
+    
+    rbHeader.appendChild(rbClose);
     rpBox.appendChild(rbHeader);
     rpBox.appendChild(rbPerc);
     rpBox.appendChild(rbAmt);
     rpBox.appendChild(rbQueue);
     rpBox.appendChild(rbPass);
     rpBox.appendChild(rbFail);
+
 
     rpBoxPerc = document.getElementById("CMY_RB_Perc");
     rpBoxAmt = document.getElementById("CMY_RB_LC_Left");
@@ -133,7 +156,10 @@ chrome.extension.onMessage.addListener(
     }
     
     rpBoxAmt.innerHTML = "Links: " + totalvalid;
-    
+    // When close element is clicked, hide UI
+    document.getElementById("CMY_RB_Close").onclick=function(){removeDOMElement("CMY_ReportBox");};
+    // Remove the event listener in the event this is run again without reloading
+    chrome.extension.onMessage.removeListener(doStuff); 
   }(pageLinks)
   )
 
@@ -165,7 +191,6 @@ chrome.extension.onMessage.addListener(
       rpBoxQueue.innerHTML = "Queue: " + queued;
     }
   }
-    
     return true;
 
   });
