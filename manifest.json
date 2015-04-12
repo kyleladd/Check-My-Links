@@ -10,5 +10,5 @@
    "permissions": [ "storage","tabs", "http://*/*", "https://*/*" ],
    "version": "3.3.3",
    "manifest_version": 2,
-   "background": { "scripts": ["background.js","db.js"] }
+   "background": { "scripts": ["background.js","db.js"],"persistent": true  }
 }
