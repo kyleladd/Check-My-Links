@@ -10,13 +10,15 @@ var blacklistDefaults =
     "adservices.google.com\n" +
     "appliedsemantics.com";
 
-var checkTypeDefault = "HEAD";    
+var checkTypeDefault = "HEAD";   
+var autoCheckDefault = "false";    
 
 function loadOptions() {
   
   var bkg = chrome.extension.getBackgroundPage();
   var blacklistItems = bkg.getItem("blacklist");
   var checkTypeSelection = bkg.getItem("checkType");
+  var autoCheck = bkg.getItem("autoCheck");
 
   if (blacklistItems === null) {
     bkg.setItem("blacklist", blacklistDefaults);
@@ -29,6 +31,14 @@ function loadOptions() {
   //blacklistItems = bkg.getItem("blacklist");
   if(blacklistItems !== null){
     blacklistItems.split(" ");
+  }
+
+  if(getItem("autoCheck") == null){
+    setItem("autoCheck", autoCheckDefault);
+    autoCheck = bkg.getItem("autoCheck");
+  }
+  if(autoCheck == 'true'){
+    document.getElementById("autoCheck").checked = true;
   }
 
   document.getElementById("blacklistEntries").value = blacklistItems;
@@ -48,9 +58,14 @@ function saveOptions() {
   var bkg = chrome.extension.getBackgroundPage();
   var blacklistEntries = document.getElementById("blacklistEntries");
   var requestType = document.getElementById("requestType");
+  var autoCheck = 'false';
+  if(document.getElementById("autoCheck").checked){
+    autoCheck = 'true';
+  }
   // Save selected options to localstore
   bkg.setItem("blacklist", blacklistEntries.value);
   bkg.setItem("checkType", requestType.children[requestType.selectedIndex].value);
+  bkg.setItem("autoCheck", autoCheck);
   document.getElementById("msg").style.visibility = "visible";
 }
 

@@ -1,21 +1,8 @@
 var logging = false;
 var checkType;
-
 chrome.extension.onMessage.addListener(onRequest);
-
-chrome.browserAction.onClicked.addListener(function (tab) {
+var beginLinkCheck = function beginLinkCheck(tab) {
     chrome.tabs.executeScript(tab.id, {file:'check.js'}, function () {
-        var blacklistDefaults = 
-        "googleleads.g.doubleclick.net\n" +
-        "doubleclick.net\n" +
-        "googleadservices.com\n" +
-        "www.googleadservices.com\n" +
-        "googlesyndication.com\n" +
-        "adservices.google.com\n" +
-        "appliedsemantics.com";
-
-        var checkTypeDefault = "HEAD";
-
         // Set up the defaults if no values are present in LocalStorage
         if (getItem("blacklist") === null) {
             setItem("blacklist", blacklistDefaults);
@@ -25,13 +12,24 @@ chrome.browserAction.onClicked.addListener(function (tab) {
           setItem("checkType", checkTypeDefault);
         }
        
-
+        if(getItem("cache") == null){
+          setItem("cache", cacheDefault);
+        }
         var blacklist = getItem("blacklist");
         checkType = getItem("checkType");
 
         chrome.tabs.sendMessage(tab.id, {bl:blacklist});
     });
+}
+chrome.tabs.onUpdated.addListener(function(tabid, changeinfo, tab) {
+    var url = tab.url;
+
+    if (url !== undefined && changeinfo.status == "complete" && getItem("autoCheck")=="true") {
+      beginLinkCheck(tab);
+    }
 });
+
+chrome.browserAction.onClicked.addListener(beginLinkCheck);
 
 function onRequest(request, sender, callback) {
     if (request.action == "check") {
