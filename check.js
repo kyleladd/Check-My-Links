@@ -69,7 +69,7 @@ chrome.extension.onMessage.addListener(
     reportStyle.appendChild(document.createTextNode("#CMY_ReportBox #CMY_RB_Perc{font-size: 50px; line-height: 50px; color:#fff; background: #111; padding: 10px; text-shadow: 0px 0px 5px rgba(255,255,255,0.8); text-align: center;}"));
     reportStyle.appendChild(document.createTextNode("#CMY_ReportBox #CMY_RB_Pass{border-top: 1px solid #bddf5d; border-right: 1px solid #8db615; float:left; border-radius: 0px 0px 0px 5px; background-color:#9fcd19; background-position-x: 8px; background-position-y: 5px;}"));
     reportStyle.appendChild(document.createTextNode("#CMY_ReportBox #CMY_RB_Fail{border-top: 1px solid #c54f4f; float: right; border-radius: 0px 0px 5px 0px; background-color: #a9060a; background-position-x: 8px; background-position-y: -52px;}"));
-    reportStyle.appendChild(document.createTextNode("#CMY_ReportBox #CMY_RB_Close{float: right;color:#ffffff}"));
+    reportStyle.appendChild(document.createTextNode("#CMY_ReportBox #CMY_RB_Close{float: right;color:#ffffff;cursor:pointer;}"));
         
     var reportBox = document.createElement("div");
     var rbHeader = document.createElement("div");
