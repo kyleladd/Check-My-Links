@@ -187,7 +187,7 @@ chrome.extension.onMessage.addListener(
       }
       queued -=1;
       checked +=1;
-      rpBoxPerc.innerHTML = Math.round((checked)/totalvalid * 100) + "%";
+      rpBoxPerc.innerHTML = Math.floor((checked)/totalvalid * 100) + "%";
       rpBoxQueue.innerHTML = "Queue: " + queued;
     }
   }
