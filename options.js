@@ -8,6 +8,7 @@ function loadOptions() {
   var checkTypeSelection = bkg.getItem("checkType");
   var cache = bkg.getItem("cache");
   var autoCheck = bkg.getItem("autoCheck");
+  var noFollow = bkg.getItem("noFollow");
 
   if (blacklistItems === null) {
     bkg.setItem("blacklist", bkg.blacklistDefaults);
@@ -39,6 +40,15 @@ function loadOptions() {
     document.getElementById("autoCheck").checked = true;
   }
 
+  if (bkg.getItem("noFollow") == null) {
+    bkg.setItem("noFollow", bkg.noFollowDefault);
+    noFollow = bkg.getItem("noFollow");
+  }
+
+  if(noFollow == 'true'){
+    document.getElementById("noFollow").checked = true;
+  }
+
   document.getElementById("blacklistEntries").value = blacklistItems;
   var requestType = document.getElementById("requestType");
  
@@ -57,6 +67,7 @@ function saveOptions() {
   var blacklistEntries = document.getElementById("blacklistEntries");
   var requestType = document.getElementById("requestType");
   var cache = 'false';
+  var noFollow = 'false';
   if(document.getElementById("cache").checked){
     cache = 'true';
   }
@@ -64,11 +75,15 @@ function saveOptions() {
   if(document.getElementById("autoCheck").checked){
     autoCheck = 'true';
   }
+  if(document.getElementById("noFollow").checked){
+    noFollow = 'true';
+  }
   // Save selected options to localstore
   bkg.setItem("blacklist", blacklistEntries.value);
   bkg.setItem("checkType", requestType.children[requestType.selectedIndex].value);
   bkg.setItem("cache", cache);
   bkg.setItem("autoCheck", autoCheck);
+  bkg.setItem("noFollow", noFollow);
   document.getElementById("msg").style.visibility = "visible";
 }
 function deleteObjectStore(){

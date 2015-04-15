@@ -10,7 +10,8 @@ var blacklistDefaults =
 
 var checkTypeDefault = "GET";
 var cacheDefault = "false";
-var autoCheckDefault = "false";    
+var autoCheckDefault = "false";
+var noFollowDefault = "false";
 chrome.extension.onMessage.addListener(onRequest);
 
 var beginLinkCheck = function beginLinkCheck(tab) {
@@ -28,8 +29,9 @@ var beginLinkCheck = function beginLinkCheck(tab) {
           setItem("cache", cacheDefault);
         }
         var blacklist = getItem("blacklist");
-
-        chrome.tabs.sendMessage(tab.id, {bl:blacklist});
+        var nofollow = getItem("noFollow");
+        
+        chrome.tabs.sendMessage(tab.id, {bl:blacklist,nf:nofollow});
     });
 }
 chrome.tabs.onUpdated.addListener(function(tabid, changeinfo, tab) {
@@ -47,7 +49,7 @@ function onRequest(request, sender, callback) {
         if (request.url) {
             if (getItem("cache")=='true'){
                 indexedDBHelper.getLink(request.url).then(function(link){
-                    if(typeof(link) != "undefined" && link.status==200){
+                    if(typeof(link) != "undefined" && (200 <= link.status && link.status < 400)){
                         log("found");
                         log(link);
                         return callback(link.status);
@@ -80,7 +82,7 @@ function check(url, callback) {
     xhr.onreadystatechange = function (data) {
         if (xhr.readyState == 4) {
             clearTimeout(XMLHttpTimeout);
-            if (getItem("cache")=='true' && xhr.status==200){
+            if (getItem("cache")=='true' && (200 <= xhr.status && xhr.status < 400)){
                 indexedDBHelper.addLink(url, xhr.status);
             }
             return callback(xhr.status);

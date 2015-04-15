@@ -23,6 +23,12 @@ function removeDOMElement(id){
   }
 }
 
+function removeElementsByClass(className){
+    var elements = document.getElementsByClassName(className);
+    while(elements.length > 0){
+        elements[0].parentNode.removeChild(elements[0]);
+    }
+}
 
 chrome.extension.onMessage.addListener(
 
@@ -37,6 +43,7 @@ chrome.extension.onMessage.addListener(
   var rpBox;
   // Clear the Previous Run
   removeDOMElement("CMY_ReportBox");
+  removeElementsByClass("CMY_Response");
   removeClassFromElements("CMY_Link");
   removeClassFromElements("CMY_Valid");
   removeClassFromElements("CMY_Invalid");
@@ -129,13 +136,15 @@ chrome.extension.onMessage.addListener(
       var url = link.href;
       var rel = link.rel;
       blacklisted = false;
-
-      if (url.length > 0 && url.startsWith('http') && rel !== "nofollow"){
+      if ((url.length <= 0) || (request.nf=='false' && rel == "nofollow") || (url.startsWith('http')===false)){
+        totalvalid -=1;
+      }
+      else{
         for (var b = 0; b < blacklist.length; b++)
         {
           if (blacklist[b] !== "" && url.contains(blacklist[b])){
             blacklisted = true;
-          }          
+          }
         }
 
         if (blacklisted === true){
@@ -147,11 +156,6 @@ chrome.extension.onMessage.addListener(
           link.classList.add("CMY_Link");
           checkURL(url, link);
         }
-
-      }
-      else{
-        console.log("Skipped: " + url);
-        totalvalid -=1;
       }
     }
     
