@@ -390,48 +390,46 @@ function getOptions(){
 
 function onRequest(request, sender, callback) {
     if (request.action == "check"){
-        if (request.url) {
-            var options = getOptions();
-            var promise;
-            var response = {status:null,document:null};
-            if(XHRisNecessary(options,request.url) === true){
-                check(request.url)
-                .then(function(response){
-                    if (options.cache == 'true' && (200 <= response.status && response.status < 400)){
-                        // Add link to database
-                        indexedDBHelper.addLink(request.url, response.status);
-                    }
-                    return new Promise(function(resolve, reject){resolve(response);});
-                })
-                .then(function(response){
-                    callback(response);
-                });
-            }
-            else{
-                // Caching is true
-                indexedDBHelper.getLink(request.url).then(function(link){
-                    if(typeof(link) != "undefined" && (200 <= link.status && link.status < 400)){
-                        log("found");
-                        log(link);
-                        response.status = link.status;
-                    }
-                    else{
-                        response = check(request.url);
-                    }
-                    return new Promise(function(resolve, reject){resolve(response);});
-                })
-                .then(function(response){
-                    if ((response.source == "xhr") && (200 <= response.status && response.status < 400)){
-                        // Add link to database
-                        indexedDBHelper.addLink(request.url, response.status);
-                    }
-                    return new Promise(function(resolve, reject){resolve(response);});
-                })
-                .then(function(response){
-                    callback(response);
-                });
-            }
-        }
-        return false;
+      var response = {status:null,document:null};
+      var options = getOptions();
+      var promise;
+      if(XHRisNecessary(options,request.url) === true){
+          check(request.url)
+          .then(function(response){
+              if (options.cache == 'true' && (200 <= response.status && response.status < 400)){
+                  // Add link to database
+                  indexedDBHelper.addLink(request.url, response.status);
+              }
+              return new Promise(function(resolve, reject){resolve(response);});
+          })
+          .then(function(response){
+              callback(response);
+          });
+      }
+      else{
+          // Caching is true
+          indexedDBHelper.getLink(request.url).then(function(link){
+              if(typeof(link) != "undefined" && (200 <= link.status && link.status < 400)){
+                  log("found");
+                  log(link);
+                  response.status = link.status;
+              }
+              else{
+                  response = check(request.url);
+              }
+              return new Promise(function(resolve, reject){resolve(response);});
+          })
+          .then(function(response){
+              if ((response.source == "xhr") && (200 <= response.status && response.status < 400)){
+                  // Add link to database
+                  indexedDBHelper.addLink(request.url, response.status);
+              }
+              return new Promise(function(resolve, reject){resolve(response);});
+          })
+          .then(function(response){
+              callback(response);
+          });
+      }
+      return false;
     }
 }

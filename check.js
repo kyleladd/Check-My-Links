@@ -70,11 +70,7 @@ chrome.extension.onMessage.addListener(
   });
   // Send links to get checked via XHR
   function checkURL(link,options) {
-    // For empty href or no attribute href elements
-    var checkElement = create("a", {
-      href: link.href
-    });
-    chrome.extension.sendMessage({"action": "check", "url": checkElement.href},
+    chrome.extension.sendMessage({"action": "check", "url": link.href},
     function (response) {
       // Assess Warnings
       var warnings = [];
