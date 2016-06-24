@@ -9,8 +9,8 @@ String.prototype.contains = function(text) {
   return this.indexOf(text) !== -1;
 };
 
-String.prototype.rtrim = function(s) { 
-    return this.replace(new RegExp(s + "*$"),''); 
+String.prototype.rtrim = function(s) {
+    return this.replace(new RegExp(s + "*$"),'');
 };
 
 function removeClassFromElements(classname) {
@@ -34,10 +34,11 @@ function removeDOMElement(id){
   }
 }
 
-function isLinkValid(link,request,blacklist){
-  var url = link.href;
+function isLinkValid(link,request,blacklist,blacklistText){
+  var url = (typeof link.href === "undefined" ? "" : link.href);
   var rel = link.rel;
   var blacklisted = false;
+  var blacklistedText = false;
   if (url.startsWith('chrome-extension://')){
     return false;
   }
@@ -50,11 +51,23 @@ function isLinkValid(link,request,blacklist){
     {
       if (blacklist[b] !== "" && url.contains(blacklist[b])){
         blacklisted = true;
+        break;
+      }
+    }
+    for (var t = 0; t < blacklistText.length; t++)
+    {
+      if (blacklistText[t] !== "" && link.innerText.toLowerCase().contains(blacklistText[t].toLowerCase())){
+        blacklistedText = true;
+        break;
       }
     }
 
     if (blacklisted === true){
       console.log("Skipped (blacklisted): " + url);
+      return false;
+    }
+    if (blacklistedText === true){
+      console.log("Skipped (blacklisted Text): " + url + " Text: " + link.innerText.toLowerCase());
       return false;
     }
     return true;
@@ -169,7 +182,7 @@ function createDisplay(optURL,cacheType,checkType){
         link.classList.add("CMY_Warning");
         link.innerHTML += " <span class=\"CMY_Response\">"+ linkStatus +"</span>";
         warning += 1;
-        rbWarning.innerHTML = "Warnings: " + warning; 
+        rbWarning.innerHTML = "Warnings: " + warning;
         console.log(response);
       }
       else {
@@ -194,7 +207,7 @@ function createDisplay(optURL,cacheType,checkType){
         el.innerHTML = props[p];
       }
       else{
-        el.setAttribute(p,props[p]);  
+        el.setAttribute(p,props[p]);
       }
     }
     return el;
@@ -269,7 +282,7 @@ function getEmptyLinkWarning(options,link,warnings){
 // Not utilized yet, would need to allow length 0 to be a valid link and then filter it out from trying to send an XHR request
 function getNoHrefLinkWarning(options,link,warnings){
   if(options.noHrefAttr == 'true'){
-    if (!link.hasAttribute("href")) {       
+    if (!link.hasAttribute("href")) {
       warnings.push("Link does not have an href attribute");
     }
   }
@@ -316,7 +329,7 @@ function getItem(key) {
     var value;
     log('Get Item:' + key);
     try {
-      value = window.localStorage.getItem(key);   
+      value = window.localStorage.getItem(key);
       if(typeof value === 'undefined'){
         return null;
       }
@@ -340,6 +353,7 @@ function getOption(key){
                     "googlesyndication.com\n" +
                     "adservices.google.com\n" +
                     "appliedsemantics.com",
+        blacklistText: "",
         checkType: "GET",
         cache: "false",
         noFollow: "false",
@@ -352,7 +366,7 @@ function getOption(key){
     // Get Option from LocalStorage
     value = getItem(key);
     // Default the value if it does not exist in LocalStorage and a default value is defined above
-    if ((value === null || value == "null") && (key in defaultOptions)) {
+    if ((value === null || value === "null" || value === undefined) && (key in defaultOptions)) {
         setItem(key, defaultOptions[key]);
         value = defaultOptions[key];
     }
@@ -375,6 +389,7 @@ function log(txt) {
 function getOptions(){
     var options = {};
     options.blacklist = getOption("blacklist");
+    options.blacklistText = getOption("blacklistText");
     options.checkType = getOption("checkType");
     options.cache = getOption("cache");
     options.noFollow = getOption("noFollow");
@@ -388,7 +403,7 @@ function getOptions(){
 
 function onRequest(request, sender, callback) {
     if (request.action == "check"){
-        if (request.url) {  
+        if (request.url) {
             var options = getOptions();
             var promise;
             var response = {status:null,document:null};

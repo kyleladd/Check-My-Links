@@ -30,7 +30,7 @@ QUnit.module("Generic DOM functions", {
     var moduleContainer = document.createElement('div');
     moduleContainer.id = 'moduleContainer';
     document.getElementById("qunit-fixture").appendChild(moduleContainer);
-    
+
     var moduleElement1 = document.createElement('div');
     moduleElement1.className = 'moduleclass';
     moduleElement1.id = 'moduleElement1';
@@ -117,30 +117,42 @@ QUnit.module("Determining Valid Links", {
   beforeEach: function() {
     // prepare something for all following tests
     this.request = {nf:'false'};
-    this.blacklist = "";
+    this.blacklist = [];
+    this.blacklistText = [];
   }
 });
 
 QUnit.test("test the isLinkValid function", function(assert) {
-    assert.equal(isLinkValid({href:"http://google.com"},this.request,this.blacklist), true, "http links are valid");
-    assert.equal(isLinkValid({href:""},this.request,this.blacklist), true, "empty links are valid so that they can be marked as a warning (option pending)");
-    assert.equal(isLinkValid({href:"#"},this.request,this.blacklist), false, "hashtag links are not valid and are marked as a warning,when chrome has a hashtag link it prepends the current url which resolves to valid link http://example.com# below");
-    assert.equal(isLinkValid({href:"http://example.com#"},this.request,this.blacklist), true, "links that end with hashtags are valid");
+    assert.equal(isLinkValid({href:"http://google.com"},this.request,this.blacklist,this.blacklistText), true, "http links are valid");
+    assert.equal(isLinkValid({href:""},this.request,this.blacklist,this.blacklistText), true, "empty links are valid so that they can be marked as a warning (option pending)");
+    assert.equal(isLinkValid({href:"#"},this.request,this.blacklist,this.blacklistText), false, "hashtag links are not valid and are marked as a warning,when chrome has a hashtag link it prepends the current url which resolves to valid link http://example.com# below");
+    assert.equal(isLinkValid({href:"http://example.com#"},this.request,this.blacklist,this.blacklistText), true, "links that end with hashtags are valid");
 
-    assert.equal(isLinkValid({href:"https://google.com"},this.request,this.blacklist), true, "https links are valid");
-    assert.equal(isLinkValid({href:"chrome-extension://"},this.request,this.blacklist), false, "chrome extension links are invalid and don't need to be checked");
-    assert.equal(isLinkValid({href:"mailto:ex@example.com"},this.request,this.blacklist), false, "mailto links are invalid and don't need to be checked");
-    assert.equal(isLinkValid({href:"http://example.com#hashtag"},this.request,this.blacklist), true, "links with hashtags are valid");
-    assert.equal(isLinkValid({href:"http://example.com",rel:"nofollow"},this.request,this.blacklist), false, "links with rel='nofollow' are not to be checked when option setting nofollow is false");
-    assert.equal(isLinkValid({href:"file://local/machine/path/index.html"},this.request,this.blacklist), false, "file links are not valid");
-    this.blacklist = "example.com";
-    assert.equal(isLinkValid({href:"http://example.com#"},this.request,this.blacklist), false, "links that end with hashtags and are blacklisted are invalid");
-    assert.equal(isLinkValid({href:"http://example.com#hashtag"},this.request,this.blacklist), false, "links with hashtags and are blacklisted are invalid");
-    assert.equal(isLinkValid({href:"http://example.com",rel:"nofollow"},this.request,this.blacklist), false, "links with rel='nofollow' are not to be checked when option setting nofollow is false and is blacklisted");
+    assert.equal(isLinkValid({href:"https://google.com"},this.request,this.blacklist,this.blacklistText), true, "https links are valid");
+    assert.equal(isLinkValid({href:"chrome-extension://"},this.request,this.blacklist,this.blacklistText), false, "chrome extension links are invalid and don't need to be checked");
+    assert.equal(isLinkValid({href:"mailto:ex@example.com"},this.request,this.blacklist,this.blacklistText), false, "mailto links are invalid and don't need to be checked");
+    assert.equal(isLinkValid({href:"http://example.com#hashtag"},this.request,this.blacklist,this.blacklistText), true, "links with hashtags are valid");
+    assert.equal(isLinkValid({href:"http://example.com",rel:"nofollow"},this.request,this.blacklist,this.blacklistText), false, "links with rel='nofollow' are not to be checked when option setting nofollow is false");
+    assert.equal(isLinkValid({href:"file://local/machine/path/index.html"},this.request,this.blacklist,this.blacklistText), false, "file links are not valid");
+    this.blacklist = ["example.com"];
+    assert.equal(isLinkValid({href:"http://example.com#"},this.request,this.blacklist,this.blacklistText), false, "links that end with hashtags and are blacklisted are invalid");
+    assert.equal(isLinkValid({href:"http://example.com#hashtag"},this.request,this.blacklist,this.blacklistText), false, "links with hashtags and are blacklisted are invalid");
+    assert.equal(isLinkValid({href:"http://example.com",rel:"nofollow"},this.request,this.blacklist,this.blacklistText), false, "links with rel='nofollow' are not to be checked when option setting nofollow is false and is blacklisted");
     this.request = {nf:'true'};
-    assert.equal(isLinkValid({href:"http://example.com",rel:"nofollow"},this.request,this.blacklist), false, "links with rel='nofollow' are not to be checked when option setting nofollow is true and are blacklisted");
-    this.blacklist = "";
-    assert.equal(isLinkValid({href:"http://example.com",rel:"nofollow"},this.request,this.blacklist), true, "links with rel='nofollow' are to be checked when option setting nofollow is true");
+    assert.equal(isLinkValid({href:"http://example.com",rel:"nofollow"},this.request,this.blacklist,this.blacklistText), false, "links with rel='nofollow' are not to be checked when option setting nofollow is true and are blacklisted");
+    this.blacklist = [""];
+    assert.equal(isLinkValid({href:"http://example.com",rel:"nofollow"},this.request,this.blacklist,this.blacklistText), true, "links with rel='nofollow' are to be checked when option setting nofollow is true");
+    this.blacklistText = [""];
+    assert.equal(isLinkValid({href:"http://example.com",innerText:"Login"},this.request,this.blacklist,this.blacklistText), true, "http links are valid");
+    assert.equal(isLinkValid({href:"http://example.com",innerText:""},this.request,this.blacklist,this.blacklistText), true, "Should be a valid link when link does not contain text");
+    this.blacklistText = ["LogIn"];
+    assert.equal(isLinkValid({href:"http://example.com",innerText:"LogIn"},this.request,this.blacklist,this.blacklistText), false, "Should be invalid when the link text matches the blacklisted text");
+    assert.equal(isLinkValid({href:"http://example.com",innerText:"Login"},this.request,this.blacklist,this.blacklistText), false, "Should be invalid when case insensitive text matching");
+    assert.equal(isLinkValid({href:"http://example.com",innerText:"Login or Logout"},this.request,this.blacklist,this.blacklistText), false, "Should be invalid when link text contains blacklisted text");
+    assert.equal(isLinkValid({href:"http://example.com",innerText:""},this.request,this.blacklist,this.blacklistText), true, "Should be a valid link when link does not contain text");
+    this.blacklistText = [" "];
+    assert.equal(isLinkValid({href:"http://example.com",innerText:"Login or Logout"},this.request,this.blacklist,this.blacklistText), false, "Should be invalid when link text contains blacklisted text");
+
 });
 
 QUnit.test("test the shouldDOMbeParsed function", function(assert) {
@@ -401,7 +413,7 @@ QUnit.module("OnRequest function", {
 
 QUnit.test("test the onrequest function make sure addLink is called when cache is true and response is 200:", function(assert) {
     window.getOption = sandbox.stub().returns("true");
-    window.XHRisNecessary = sandbox.stub().returns(true);    
+    window.XHRisNecessary = sandbox.stub().returns(true);
     var spy = sandbox.spy(indexedDBHelper,"addLink");
     window.check = sandbox.stub().returns(new Promise(function(resolve, reject){resolve({status:200,document:null,source:"xhr"});}));
     onRequest({action:"check",url:"http://example.com/"},null,function(){});
@@ -417,7 +429,7 @@ QUnit.test("test the onrequest function make sure addLink is called when cache i
 
 QUnit.test("test the onrequest function make sure addLink is not called when cache is true and response is 404:", function(assert) {
     window.getOption = sandbox.stub().returns("true");
-    window.XHRisNecessary = sandbox.stub().returns(true);    
+    window.XHRisNecessary = sandbox.stub().returns(true);
     var spy = sandbox.spy(indexedDBHelper,"addLink");
     window.check = sandbox.stub().returns(new Promise(function(resolve, reject){resolve({status:404,document:null,source:"xhr"});}));
     onRequest({action:"check",url:"http://example.com/"},null,function(){});
@@ -433,7 +445,7 @@ QUnit.test("test the onrequest function make sure addLink is not called when cac
 
 QUnit.test("test the onrequest function make sure addLink is not called when cache is false and response is 200:", function(assert) {
     window.getOption = sandbox.stub().returns("false");
-    window.XHRisNecessary = sandbox.stub().returns(true);    
+    window.XHRisNecessary = sandbox.stub().returns(true);
     var spy = sandbox.spy(indexedDBHelper,"addLink");
     window.check = sandbox.stub().returns(new Promise(function(resolve, reject){resolve({status:200,document:null,source:"xhr"});}));
     onRequest({action:"check",url:"http://example.com/"},null,function(){});
@@ -449,8 +461,8 @@ QUnit.test("test the onrequest function make sure addLink is not called when cac
 
 QUnit.test("test the onrequest function make sure getLink is called when cache is true and addLink is not called when not found:", function(assert) {
     window.getOption = sandbox.stub().returns("true");
-    window.XHRisNecessary = sandbox.stub().returns(false);    
-    var stub = sandbox.stub(indexedDBHelper,"getLink").returns(new Promise(function(resolve, reject){resolve(500);}));    
+    window.XHRisNecessary = sandbox.stub().returns(false);
+    var stub = sandbox.stub(indexedDBHelper,"getLink").returns(new Promise(function(resolve, reject){resolve(500);}));
     window.check = sandbox.stub().returns(new Promise(function(resolve, reject){resolve({status:200,document:null,source:"xhr"});}));
     onRequest({action:"check",url:"http://example.com/"},null,function(){});
     assert.ok(window.getOption.called);
@@ -465,8 +477,8 @@ QUnit.test("test the onrequest function make sure getLink is called when cache i
 
 QUnit.test("test the onrequest function make sure getLink is called when cache is true and addLink is called when found 200:", function(assert) {
     window.getOption = sandbox.stub().returns("true");
-    window.XHRisNecessary = sandbox.stub().returns(false);    
-    var stub = sandbox.stub(indexedDBHelper,"getLink").returns(new Promise(function(resolve, reject){resolve({status:200});}));    
+    window.XHRisNecessary = sandbox.stub().returns(false);
+    var stub = sandbox.stub(indexedDBHelper,"getLink").returns(new Promise(function(resolve, reject){resolve({status:200});}));
     window.check = sandbox.stub().returns(new Promise(function(resolve, reject){resolve({status:200,document:null,source:"xhr"});}));
     onRequest({action:"check",url:"http://example.com/"},null,function(){});
     assert.ok(window.getOption.called);

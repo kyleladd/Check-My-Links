@@ -2,7 +2,7 @@
 // @ocodia
 
 function loadOptions() {
-  
+
   var bkg = chrome.runtime.getBackgroundPage(function(bkg){
    var options = bkg.getOptions();
 
@@ -31,8 +31,9 @@ function loadOptions() {
     }
 
     document.getElementById("blacklistEntries").value = options.blacklist.split(" ");
+    document.getElementById("blacklistTextEntries").value = options.blacklistText.split(" ");
     var requestType = document.getElementById("requestType");
-   
+
     for (var i = 0; i < requestType.children.length; i++) {
       var requestTypechild = requestType.children[i];
         if (requestTypechild.value == options.checkType) {
@@ -46,10 +47,12 @@ function loadOptions() {
 function saveOptions() {
   var bkg = chrome.runtime.getBackgroundPage(function(bkg){
     var blacklistEntries = document.getElementById("blacklistEntries");
+    var blacklistTextEntries = document.getElementById("blacklistTextEntries");
     var requestType = document.getElementById("requestType");
 
     // Save selected options to localstore
     bkg.setItem("blacklist", blacklistEntries.value);
+    bkg.setItem("blacklistText", blacklistTextEntries.value.toLowerCase());
     bkg.setItem("checkType", requestType.children[requestType.selectedIndex].value);
 
     if(document.getElementById("cache").checked){bkg.setItem("cache", 'true');}else{bkg.setItem("cache", 'false');}
