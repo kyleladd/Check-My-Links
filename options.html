@@ -10,18 +10,21 @@
 
 		<p style="line-height: 26px">For example: <span>www.mydomain.com</span> will prevent the following links from being checked: <span>www.mydomain.com/page1.html</span> or <span>www.mydomain.com/page2.html</span></p>
 
-		<label for="blacklistEntries">Exclude links from these domains:</label><br/>
+		<label for="blacklistEntries">Exclude links from these domains:</label>
 		<textarea name="blacklistEntries" id="blacklistEntries" rows="2" cols="20"></textarea>
+
+		<p>To prevent this extension from checking a link based on its innerText, enter regex patterns below. Each link innerText's regex must be entered on a new line. <a href="http://www.w3schools.com/jsref/jsref_obj_regexp.asp" target="_blank">Reference</a></p>
+		<p style="line-height: 26px">For example: <span>/Logout/i</span> will prevent the following links from being checked: <span>&#x3C;a href=&#x22;login.aspx&#x22;&#x3E;Logout&#x3C;/a&#x3E;</span> or <span>&#x3C;a href=&#x22;login.aspx&#x22;&#x3E;login or logout&#x3C;/a&#x3E;</span></p>
+		<label for="blacklistEntries">Exclude links with this in their text:</label><br/>
+		<textarea name="blacklistTextEntries" id="blacklistTextEntries" rows="2" cols="20"></textarea>
 		<hr/>
 
-		<label for="requestType">Method of Request: </label> 
-
+		<label for="requestType">Method of Request: </label>
 
 		<select id="requestType">
 			<option value="GET">GET</option>
-			<option value="HEAD">HEAD</option>			
+			<option value="HEAD">HEAD</option>
 		</select>
-
 
 		<p>HEAD is quicker, but sometimes doesn't reflect the true HTTP status of a page, use GET if you're getting weird results.  GET is required to be able to parse the document for an element corresponding to what is after the hashtag by ID.</p>
 
@@ -32,7 +35,7 @@
 		<p>Warnings are shown in the console.log (F12->Console tab). Also, they are highlighted yellow.</p>
 		<input type="checkbox" name="parseDOM" id="parseDOM" value="1"><label for="parseDOM">Parse DOM after hashtag (&lt;a href=&quot;page2.html#elementID&quot;&gt;Link&lt;/a&gt;) </label> 
 		<p>Hashtags can link to elements by id within the DOM. Enabling will add add the check to make sure an element exists by id to correspond to the hashtag.  When enabled, if the page resolves but the corresponding element is not found, the element will be marked as a warning. <strong>Request Type: GET is required</strong></p>
-		
+
 		<input type="checkbox" name="trailingHash" id="trailingHash" value="1"><label for="trailingHash">Trailing '#' (&lt;a href=&quot;#&quot;&gt;Link&lt;/a&gt;") </label> 
 		<p>When enabled, if the link url endswith '#' you will be warned.</p>
 
@@ -41,7 +44,7 @@
 
 		<input type="checkbox" name="noHrefAttr" id="noHrefAttr" value="1"><label for="noHrefAttr">Anchor tag without href (&lt;a&gt;No href&lt;/a&gt;) </label> 
 		<p>When enabled, if there is an anchor tag without an 'href' attribute you will be warned.</p>
-		
+
 		<hr/>
 
 		<strong>Valid Link Caching</strong>

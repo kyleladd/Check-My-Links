@@ -11,6 +11,8 @@ chrome.extension.onMessage.addListener(
     var rpBox;
     var blacklist = request.options.blacklist;
     blacklist = blacklist.split("\n");
+    var blacklistText = request.options.blacklistText;
+    blacklistText = blacklistText.split("\n");
     var cacheType = request.options.cache;
     var checkType = request.options.checkType;
     var optURL = request.options.optionsURL;
@@ -25,7 +27,7 @@ chrome.extension.onMessage.addListener(
     for (var i = 0; i < pageLinks.length; i++){
       var link = pageLinks[i];
       var isValidLink = false;
-      isValidLink = isLinkValid(link,request,blacklist);
+      isValidLink = isLinkValid(link,request,blacklist,blacklistText);
       if(isValidLink === true){
         queued += 1;
         link.classList.add("CMY_Link");

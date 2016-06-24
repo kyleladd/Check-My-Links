@@ -34,10 +34,11 @@ function removeDOMElement(id){
   }
 }
 
-function isLinkValid(link,request,blacklist){
-  var url = link.href;
+function isLinkValid(link,request,blacklist,blacklistText){
+  var url = (typeof link.href === "undefined" ? "" : link.href);
   var rel = link.rel;
   var blacklisted = false;
+  var blacklistedText = false;
   if (url.startsWith('chrome-extension://')){
     return false;
   }
@@ -50,11 +51,35 @@ function isLinkValid(link,request,blacklist){
     {
       if (blacklist[b] !== "" && url.contains(blacklist[b])){
         blacklisted = true;
+        break;
+      }
+    }
+    for (var t = 0; t < blacklistText.length; t++)
+    {
+      // http://stackoverflow.com/a/874742/2000485
+      var match = blacklistText[t].match(new RegExp('^/(.*?)/([gimy]*)$'));
+      var regex;
+      try{
+        regex = new RegExp(match[1], match[2]);
+      }
+      catch(err){
+        regex = null;
+      }
+      if(regex === null){
+        regex = blacklistText[t];
+      }
+      if (blacklistText[t] !== "" && link.innerText.search(regex) !== -1){
+        blacklistedText = true;
+        break;
       }
     }
 
     if (blacklisted === true){
       console.log("Skipped (blacklisted): " + url);
+      return false;
+    }
+    if (blacklistedText === true){
+      console.log("Skipped (blacklisted Text): " + url + " Text: " + link.innerText.toLowerCase());
       return false;
     }
     return true;
@@ -340,6 +365,7 @@ function getOption(key){
                     "googlesyndication.com\n" +
                     "adservices.google.com\n" +
                     "appliedsemantics.com",
+        blacklistText: "",
         checkType: "GET",
         cache: "false",
         noFollow: "false",
@@ -353,7 +379,7 @@ function getOption(key){
     // Get Option from LocalStorage
     value = getItem(key);
     // Default the value if it does not exist in LocalStorage and a default value is defined above
-    if ((value === null || value == "null") && (key in defaultOptions)) {
+    if ((value === null || value === "null" || value === undefined) && (key in defaultOptions)) {
         setItem(key, defaultOptions[key]);
         value = defaultOptions[key];
     }
@@ -376,6 +402,7 @@ function log(txt) {
 function getOptions(){
     var options = {};
     options.blacklist = getOption("blacklist");
+    options.blacklistText = getOption("blacklistText");
     options.checkType = getOption("checkType");
     options.cache = getOption("cache");
     options.noFollow = getOption("noFollow");
