@@ -150,39 +150,37 @@ function createDisplay(optURL,cacheType,checkType){
 }
 
   function updateDisplay(link,warnings,linkStatus){
-    if (linkStatus) {
-      if (200 <= linkStatus && linkStatus < 400 && warnings.length === 0) {
-        link.classList.add("CMY_Valid");
-        passed += 1;
-        rbPass.innerHTML = "Valid links: " + passed;
-      }
-      else if(200 <= linkStatus && linkStatus < 400 && warnings.length > 0){
-        var response;
-        response = "Response " + linkStatus + ": " + link.href + " Warning: ";
-        for (var i = 0; i < warnings.length; i++)
-        {
-          response += warnings[i];
-          if(i < warnings.length-1){
-            response += ",";
-          }
-        }
-        link.classList.add("CMY_Warning");
-        link.innerHTML += " <span class=\"CMY_Response\">"+ linkStatus +"</span>";
-        warning += 1;
-        rbWarning.innerHTML = "Warnings: " + warning; 
-        console.log(response);
-      }
-      else {
-        console.log("Response " + linkStatus + ": " + link.href);
-        link.classList.add("CMY_Invalid");
-        link.innerHTML += " <span class=\"CMY_Response\">" + linkStatus + "</span>";
-        invalid += 1;
-        rbFail.innerHTML =  "Invalid links: " +invalid;
-      }
-      queued -= 1;
-      checked += 1;
-      rbQueue.innerHTML = "Queue: " + queued;
+    if (200 <= linkStatus && linkStatus < 400 && warnings.length === 0) {
+      link.classList.add("CMY_Valid");
+      passed += 1;
+      rbPass.innerHTML = "Valid links: " + passed;
     }
+    else if(200 <= linkStatus && linkStatus < 400 && warnings.length > 0){
+      var response;
+      response = "Response " + linkStatus + ": " + link.href + " Warning: ";
+      for (var i = 0; i < warnings.length; i++)
+      {
+        response += warnings[i];
+        if(i < warnings.length-1){
+          response += ",";
+        }
+      }
+      link.classList.add("CMY_Warning");
+      link.innerHTML += " <span class=\"CMY_Response\">"+ linkStatus +"</span>";
+      warning += 1;
+      rbWarning.innerHTML = "Warnings: " + warning; 
+      console.log(response);
+    }
+    else {
+      console.log("Response " + linkStatus + ": " + link.href);
+      link.classList.add("CMY_Invalid");
+      link.innerHTML += " <span class=\"CMY_Response\">" + linkStatus + "</span>";
+      invalid += 1;
+      rbFail.innerHTML =  "Invalid links: " +invalid;
+    }
+    queued -= 1;
+    checked += 1;
+    rbQueue.innerHTML = "Queue: " + queued;
   }
   function create(name, props) {
     var el = document.createElement(name);
