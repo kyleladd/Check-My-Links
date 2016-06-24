@@ -52,7 +52,7 @@ function saveOptions() {
 
     // Save selected options to localstore
     bkg.setItem("blacklist", blacklistEntries.value);
-    bkg.setItem("blacklistText", blacklistTextEntries.value.toLowerCase());
+    bkg.setItem("blacklistText", blacklistTextEntries.value);
     bkg.setItem("checkType", requestType.children[requestType.selectedIndex].value);
 
     if(document.getElementById("cache").checked){bkg.setItem("cache", 'true');}else{bkg.setItem("cache", 'false');}

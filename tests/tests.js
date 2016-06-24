@@ -145,14 +145,22 @@ QUnit.test("test the isLinkValid function", function(assert) {
     this.blacklistText = [""];
     assert.equal(isLinkValid({href:"http://example.com",innerText:"Login"},this.request,this.blacklist,this.blacklistText), true, "http links are valid");
     assert.equal(isLinkValid({href:"http://example.com",innerText:""},this.request,this.blacklist,this.blacklistText), true, "Should be a valid link when link does not contain text");
-    this.blacklistText = ["LogIn"];
+    this.blacklistText = ["/LogIn/gi"];
     assert.equal(isLinkValid({href:"http://example.com",innerText:"LogIn"},this.request,this.blacklist,this.blacklistText), false, "Should be invalid when the link text matches the blacklisted text");
-    assert.equal(isLinkValid({href:"http://example.com",innerText:"Login"},this.request,this.blacklist,this.blacklistText), false, "Should be invalid when case insensitive text matching");
+    assert.equal(isLinkValid({href:"http://example.com",innerText:"Login"},this.request,this.blacklist,this.blacklistText), false, "Should be invalid when case insensitive text matching when there is an 'i' flag");
     assert.equal(isLinkValid({href:"http://example.com",innerText:"Login or Logout"},this.request,this.blacklist,this.blacklistText), false, "Should be invalid when link text contains blacklisted text");
     assert.equal(isLinkValid({href:"http://example.com",innerText:""},this.request,this.blacklist,this.blacklistText), true, "Should be a valid link when link does not contain text");
-    this.blacklistText = [" "];
-    assert.equal(isLinkValid({href:"http://example.com",innerText:"Login or Logout"},this.request,this.blacklist,this.blacklistText), false, "Should be invalid when link text contains blacklisted text");
+    this.blacklistText = ["/LogIn/"];
+    assert.equal(isLinkValid({href:"http://example.com",innerText:"LogIn"},this.request,this.blacklist,this.blacklistText), false, "Should be invalid when the link text matches the blacklisted text");
+    assert.equal(isLinkValid({href:"http://example.com",innerText:"Login"},this.request,this.blacklist,this.blacklistText), true, "Should be valid when case insensitive flag 'i' is not a part of the regex");
+    assert.equal(isLinkValid({href:"http://example.com",innerText:"LogIn or Logout"},this.request,this.blacklist,this.blacklistText), false, "Should be invalid when link text contains blacklisted text regex");
+    assert.equal(isLinkValid({href:"http://example.com",innerText:""},this.request,this.blacklist,this.blacklistText), true, "Should be a valid link when link does not contain text");
 
+    this.blacklistText = ["LogIn"];
+    assert.equal(isLinkValid({href:"http://example.com",innerText:"LogIn"},this.request,this.blacklist,this.blacklistText), false, "Should be invalid when the link text matches the blacklisted text");
+    assert.equal(isLinkValid({href:"http://example.com",innerText:"Login"},this.request,this.blacklist,this.blacklistText), true, "Should be valid when case insensitive flag 'i' is not a part of the regex");
+    assert.equal(isLinkValid({href:"http://example.com",innerText:"LogIn or Logout"},this.request,this.blacklist,this.blacklistText), false, "Should be invalid when link text contains blacklisted text regex");
+    assert.equal(isLinkValid({href:"http://example.com",innerText:""},this.request,this.blacklist,this.blacklistText), true, "Should be a valid link when link does not contain text");
 });
 
 QUnit.test("test the shouldDOMbeParsed function", function(assert) {

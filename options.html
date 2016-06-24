@@ -13,8 +13,8 @@
 		<label for="blacklistEntries">Exclude links from these domains:</label>
 		<textarea name="blacklistEntries" id="blacklistEntries" rows="2" cols="20"></textarea>
 
-		<p>To prevent this extension from checking a link based on innerText it contains, enter it below. Each link innerText must be entered on a new line. Note: This is case-insensitive.</p>
-		<p style="line-height: 26px">For example: <span>Logout</span> will prevent the following links from being checked: <span>&#x3C;a href=&#x22;login.aspx&#x22;&#x3E;Logout&#x3C;/a&#x3E;</span> or <span>&#x3C;a href=&#x22;login.aspx&#x22;&#x3E;login or logout&#x3C;/a&#x3E;</span></p>
+		<p>To prevent this extension from checking a link based on its innerText, enter regex patterns below. Each link innerText's regex must be entered on a new line. <a href="http://www.w3schools.com/jsref/jsref_obj_regexp.asp" target="_blank">Reference</a></p>
+		<p style="line-height: 26px">For example: <span>/Logout/i</span> will prevent the following links from being checked: <span>&#x3C;a href=&#x22;login.aspx&#x22;&#x3E;Logout&#x3C;/a&#x3E;</span> or <span>&#x3C;a href=&#x22;login.aspx&#x22;&#x3E;login or logout&#x3C;/a&#x3E;</span></p>
 		<label for="blacklistEntries">Exclude links with this in their text:</label><br/>
 		<textarea name="blacklistTextEntries" id="blacklistTextEntries" rows="2" cols="20"></textarea>
 		<hr/>

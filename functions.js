@@ -56,7 +56,19 @@ function isLinkValid(link,request,blacklist,blacklistText){
     }
     for (var t = 0; t < blacklistText.length; t++)
     {
-      if (blacklistText[t] !== "" && link.innerText.toLowerCase().contains(blacklistText[t].toLowerCase())){
+      // http://stackoverflow.com/a/874742/2000485
+      var match = blacklistText[t].match(new RegExp('^/(.*?)/([gimy]*)$'));
+      var regex;
+      try{
+        regex = new RegExp(match[1], match[2]);
+      }
+      catch(err){
+        regex = null;
+      }
+      if(regex === null){
+        regex = blacklistText[t];
+      }
+      if (blacklistText[t] !== "" && link.innerText.search(regex) !== -1){
         blacklistedText = true;
         break;
       }
