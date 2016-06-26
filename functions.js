@@ -9,8 +9,8 @@ String.prototype.contains = function(text) {
   return this.indexOf(text) !== -1;
 };
 
-String.prototype.rtrim = function(s) { 
-    return this.replace(new RegExp(s + "*$"),''); 
+String.prototype.rtrim = function(s) {
+    return this.replace(new RegExp(s + "*$"),'');
 };
 
 function removeClassFromElements(classname) {
@@ -169,7 +169,7 @@ function createDisplay(optURL,cacheType,checkType){
         link.classList.add("CMY_Warning");
         link.innerHTML += " <span class=\"CMY_Response\">"+ linkStatus +"</span>";
         warning += 1;
-        rbWarning.innerHTML = "Warnings: " + warning; 
+        rbWarning.innerHTML = "Warnings: " + warning;
         console.log(response);
       }
       else {
@@ -194,7 +194,7 @@ function createDisplay(optURL,cacheType,checkType){
         el.innerHTML = props[p];
       }
       else{
-        el.setAttribute(p,props[p]);  
+        el.setAttribute(p,props[p]);
       }
     }
     return el;
@@ -214,29 +214,44 @@ var timeout = 30000;
 function check(url) {
     var response = {status:null,document:null};
     return new Promise(function(resolve, reject){
-    var XMLHttpTimeout = null;
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function (data) {
-        if (xhr.readyState == 4) {
-            log(xhr);
-            clearTimeout(XMLHttpTimeout);
-            if (200 <= xhr.status && xhr.status < 400){
-              response.document = xhr.responseText;
-            }
-            response.source = "xhr";
-            response.status = xhr.status;
-            resolve(response);
-        }
-    };
-
-    try {
-      xhr.open(getOption("checkType"), url, true);
-      xhr.send();
-    }
-    catch(e){
-      console.log(e);
-    }
-    XMLHttpTimeout = setTimeout(function (){response.status = 408;resolve(response); xhr.abort();}, timeout += 1000);
+      // var url = "http://www2.morrisville.edu/admissions/requestinfo";
+      request({
+        followAllRedirects: true,
+        url: url
+      }, function (error, response, body) {
+      console.log("response",response);
+      console.log("error",error);
+      if (!error) {
+        response.source = "xhr";
+        response.document = response.body;
+        response.status = response.statusCode;
+        console.log(response);
+        resolve(response);
+      }
+      });
+    // var XMLHttpTimeout = null;
+    // var xhr = new XMLHttpRequest();
+    // xhr.onreadystatechange = function (data) {
+    //     if (xhr.readyState == 4) {
+    //         log(xhr);
+    //         clearTimeout(XMLHttpTimeout);
+    //         if (200 <= xhr.status && xhr.status < 400){
+    //           response.document = xhr.responseText;
+    //         }
+    //         response.source = "xhr";
+    //         response.status = xhr.status;
+    //         resolve(response);
+    //     }
+    // };
+    //
+    // try {
+    //   xhr.open(getOption("checkType"), url, true);
+    //   xhr.send();
+    // }
+    // catch(e){
+    //   console.log(e);
+    // }
+    // XMLHttpTimeout = setTimeout(function (){response.status = 408;resolve(response); xhr.abort();}, timeout += 1000);
   });
 }
 
@@ -269,7 +284,7 @@ function getEmptyLinkWarning(options,link,warnings){
 // Not utilized yet, would need to allow length 0 to be a valid link and then filter it out from trying to send an XHR request
 function getNoHrefLinkWarning(options,link,warnings){
   if(options.noHrefAttr == 'true'){
-    if (!link.hasAttribute("href")) {       
+    if (!link.hasAttribute("href")) {
       warnings.push("Link does not have an href attribute");
     }
   }
@@ -316,7 +331,7 @@ function getItem(key) {
     var value;
     log('Get Item:' + key);
     try {
-      value = window.localStorage.getItem(key);   
+      value = window.localStorage.getItem(key);
       if(typeof value === 'undefined'){
         return null;
       }
@@ -388,13 +403,14 @@ function getOptions(){
 
 function onRequest(request, sender, callback) {
     if (request.action == "check"){
-        if (request.url) {  
+        if (request.url) {
             var options = getOptions();
             var promise;
             var response = {status:null,document:null};
             if(XHRisNecessary(options,request.url) === true){
                 check(request.url)
                 .then(function(response){
+                  console.log("onrequest response callback", response);
                     if (options.cache == 'true' && (200 <= response.status && response.status < 400)){
                         // Add link to database
                         indexedDBHelper.addLink(request.url, response.status);
