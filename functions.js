@@ -150,8 +150,13 @@ function createDisplay(optURL,cacheType,checkType){
 }
 
   function updateDisplay(link,warnings,linkStatus){
-    if (linkStatus) {
-      if (200 <= linkStatus && linkStatus < 400 && warnings.length === 0) {
+    console.log("linkstatus",linkStatus);
+      if (linkStatus === 307) {
+        link.classList.add("CMY_Redirect");
+        passed += 1;
+        rbPass.innerHTML = "Valid links: " + passed; 
+      }
+      else if (200 <= linkStatus && linkStatus < 400 && warnings.length === 0) {
         link.classList.add("CMY_Valid");
         passed += 1;
         rbPass.innerHTML = "Valid links: " + passed;
@@ -182,7 +187,8 @@ function createDisplay(optURL,cacheType,checkType){
       queued -= 1;
       checked += 1;
       rbQueue.innerHTML = "Queue: " + queued;
-    }
+      console.log("QUEUED",queued);
+    // }
   }
   function create(name, props) {
     var el = document.createElement(name);
@@ -212,21 +218,25 @@ function shouldDOMbeParsed(url,parseDOMoption, checkTypeOption){
 // Timeout for each link is 30+1 seconds
 var timeout = 30000;
 function check(url) {
-    var response = {status:null,document:null};
+    var response = {status:0,document:""};
     return new Promise(function(resolve, reject){
       // var url = "http://www2.morrisville.edu/admissions/requestinfo";
       request({
         followAllRedirects: true,
         url: url
       }, function (error, response, body) {
-      console.log("response",response);
+      console.log("response in check",response);
       console.log("error",error);
       if (!error) {
         response.source = "xhr";
         response.document = response.body;
         response.status = response.statusCode;
-        console.log(response);
+        response.urlAddress = response.url;
+        console.log("Check response right before resolve",response);
         resolve(response);
+      }
+      else{
+        // resolve({status:0,document:""});
       }
       });
     // var XMLHttpTimeout = null;
@@ -402,11 +412,12 @@ function getOptions(){
 }
 
 function onRequest(request, sender, callback) {
+  console.log("sender",sender);
     if (request.action == "check"){
         if (request.url) {
             var options = getOptions();
             var promise;
-            var response = {status:null,document:null};
+            var response = {status:0,document:""};
             if(XHRisNecessary(options,request.url) === true){
                 check(request.url)
                 .then(function(response){
@@ -418,7 +429,15 @@ function onRequest(request, sender, callback) {
                     return new Promise(function(resolve, reject){resolve(response);});
                 })
                 .then(function(response){
-                    callback(response);
+                    console.log("onrequest response right before callback",response);
+                    var result = {
+                      "status":response.statusCode,
+                      "document":response.document,
+                      "source":response.source,
+                      "url":response.urlAddress
+                    };
+                    console.log("result",result)
+                    callback(result);
                 });
             }
             else{
