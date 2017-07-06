@@ -4,9 +4,10 @@ var invalid = 0;
 var warning = 0;
 var redirected = 0;
 var passed = 0;
+console.log("browser",browser);
 browser.runtime.onMessage.addListener(
 
-  function doStuff(request, sender) {
+  function doStuff(request, sender,callback) {
 
   if(request.action == "initial"){
     var rpBox;
@@ -66,6 +67,51 @@ browser.runtime.onMessage.addListener(
     };
     // Remove the event listener in the event this is run again without reloading
     browser.runtime.onMessage.removeListener(doStuff);
+    }
+    else if (request.action == "check"){
+        if (request.url) {  
+            var options = getOptions();
+            var promise;
+            var response = {status:null,document:null};
+            if(XHRisNecessary(options,request.url) === true){
+                check(request.url)
+                .then(function(response){
+                    if (options.cache == 'true' && (200 <= response.status && response.status < 400)){
+                        // Add link to database
+                        indexedDBHelper.addLink(request.url, response.status);
+                    }
+                    return new Promise(function(resolve, reject){resolve(response);});
+                })
+                .then(function(response){
+                    callback(response);
+                });
+            }
+            else{
+                // Caching is true
+                indexedDBHelper.getLink(request.url).then(function(link){
+                    if(typeof(link) != "undefined" && (200 <= link.status && link.status < 400)){
+                        log("found");
+                        log(link);
+                        response.status = link.status;
+                    }
+                    else{
+                        response = check(request.url);
+                    }
+                    return new Promise(function(resolve, reject){resolve(response);});
+                })
+                .then(function(response){
+                    if ((response.source == "xhr") && (200 <= response.status && response.status < 400)){
+                        // Add link to database
+                        indexedDBHelper.addLink(request.url, response.status);
+                    }
+                    return new Promise(function(resolve, reject){resolve(response);});
+                })
+                .then(function(response){
+                    callback(response);
+                });
+            }
+        }
+        return false;
     }
     return true;
 

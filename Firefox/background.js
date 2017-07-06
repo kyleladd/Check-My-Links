@@ -11,7 +11,7 @@ browser.tabs.onUpdated.addListener(function(tabid, changeinfo, tab) {
      //If the active tab was updated
      if(activeTab.id == tab.id){
         var url = tab.url;
-        if (url !== undefined && changeinfo.status == "complete" && getItem("autoCheck")=="true") {
+        if (url !== undefined && changeinfo !== undefined && changeinfo.status == "complete" && getItem("autoCheck")=="true") {
           beginLinkCheck(tab);
         }
      }

@@ -38,3 +38,7 @@ www.opensource.org/licenses/MIT
 
 Special thanks to Kyle Ladd for most of the features and refinements to this extension over the last year. He has helped make this extension into what I'd hoped it would become.
 
+### Development Notes:
+https://developer.mozilla.org/en-US/Add-ons/WebExtensions/manifest.json/permissions
+https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Getting_started_with_web-ext
+about:debugging
