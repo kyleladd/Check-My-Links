@@ -3,7 +3,7 @@
 
 function loadOptions() {
   
-  var bkg = chrome.runtime.getBackgroundPage(function(bkg){
+  var bkg = browser.runtime.getBackgroundPage(function(bkg){
    var options = bkg.getOptions();
 
     if(options.cache == 'true'){
@@ -47,7 +47,7 @@ function loadOptions() {
 }
 
 function saveOptions() {
-  var bkg = chrome.runtime.getBackgroundPage(function(bkg){
+  var bkg = browser.runtime.getBackgroundPage(function(bkg){
     var blacklistEntries = document.getElementById("blacklistEntries");
     var requestType = document.getElementById("requestType");
 

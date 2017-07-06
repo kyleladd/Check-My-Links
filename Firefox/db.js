@@ -1,4 +1,5 @@
 var indexedDBHelper = function(){
+  window.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
   var db = null;
   var lastIndex = 0;
 
@@ -12,13 +13,13 @@ var indexedDBHelper = function(){
 
     var promise = new Promise(function(resolve, reject){
       //Opening the DB
-      var request = indexedDB.open("CheckLinks", version);
+      var request = window.indexedDB.open("CheckLinks",{version: 1, storage: "persistent"});
 
       //Will be called if the database is new or the version is modified
       request.onupgradeneeded = function(e) {
         db = e.target.result;
 
-        e.target.transaction.onerror = indexedDB.onerror;
+        e.target.transaction.onerror = window.indexedDB.onerror;
 
         //Deleting DB if already exists
         if(db.objectStoreNames.contains("links")) {
@@ -39,6 +40,7 @@ var indexedDBHelper = function(){
 
       //If DB couldn't be opened for some reason
       request.onerror = function(e){
+        console.log("IndexedDB Error",e);
         reject("Couldn't open DB");
       };
     });
@@ -195,4 +197,4 @@ var indexedDBHelper = function(){
 
 }();
 
-indexedDBHelper.init();
+// indexedDBHelper.init();

@@ -4,7 +4,7 @@ var invalid = 0;
 var warning = 0;
 var redirected = 0;
 var passed = 0;
-chrome.extension.onMessage.addListener(
+browser.runtime.onMessage.addListener(
 
   function doStuff(request, sender) {
 
@@ -65,7 +65,7 @@ chrome.extension.onMessage.addListener(
     console.log(output);
     };
     // Remove the event listener in the event this is run again without reloading
-    chrome.extension.onMessage.removeListener(doStuff);
+    browser.runtime.onMessage.removeListener(doStuff);
     }
     return true;
 
@@ -76,7 +76,7 @@ chrome.extension.onMessage.addListener(
     var checkElement = create("a", {
       href: link.href
     });
-    chrome.extension.sendMessage({"action": "check", "url": checkElement.href},
+    browser.runtime.sendMessage({"action": "check", "url": checkElement.href},
     function (response) {
       // Assess Warnings
       var warnings = [];
